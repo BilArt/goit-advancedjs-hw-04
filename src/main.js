@@ -10,7 +10,7 @@ const form = document.querySelector('#search-form');
 const input = form.querySelector('input[name="searchQuery"]');
 const loader = document.querySelector('.loader');
 const loadMoreBtn = document.createElement('button');
-loadMoreBtn.textContent = 'Load More';
+loadMoreBtn.textContent = 'Load more';
 loadMoreBtn.classList.add('btn', 'btn-secondary');
 loadMoreBtn.style.display = 'none';
 document.body.appendChild(loadMoreBtn);
@@ -34,6 +34,7 @@ form.addEventListener('submit', async event => {
 
   clearGallery();
   loader.style.display = 'block';
+  loadMoreBtn.style.display = 'none';
 
   try {
     const data = await fetchImages(query, page);
@@ -41,10 +42,7 @@ form.addEventListener('submit', async event => {
     totalHits = data.totalHits;
 
     if (data.hits.length === 0) {
-      showNotification(
-        'Sorry, there are no images matching your search query. Please try again!',
-        'error'
-      );
+      showNotification('Sorry, no images found. Please try again!', 'error');
       loadMoreBtn.style.display = 'none';
     } else {
       renderImages(data.hits);
@@ -53,7 +51,6 @@ form.addEventListener('submit', async event => {
   } catch (error) {
     loader.style.display = 'none';
     showNotification('An error occurred. Please try again later.', 'error');
-    loadMoreBtn.style.display = 'none';
   }
 });
 
@@ -65,24 +62,15 @@ loadMoreBtn.addEventListener('click', async () => {
     const data = await fetchImages(query, page);
     loader.style.display = 'none';
 
-    if (data.hits.length === 0 || page * 15 >= totalHits) {
-      showNotification(
-        'Sorry, but you have reached the end of search results.',
-        'info'
-      );
+    if (data.hits.length === 0 || (page * 15) >= totalHits) {
+      showNotification("We're sorry, but you've reached the end of search results.", 'info');
       loadMoreBtn.style.display = 'none';
     } else {
       renderImages(data.hits);
-      window.scrollBy({
-        top:
-          document
-            .querySelector('.gallery')
-            .firstElementChild.getBoundingClientRect().height * 2,
-        behavior: 'smoth',
-      });
+      window.scrollBy({ top: document.querySelector('.gallery').firstElementChild.getBoundingClientRect().height * 2, behavior: 'smooth' });
     }
   } catch (error) {
     loader.style.display = 'none';
-    showNotification('An error occured. Please try again later.', 'error');
+    showNotification('An error occurred. Please try again later.', 'error');
   }
 });

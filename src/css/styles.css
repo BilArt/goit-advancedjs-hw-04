@@ -42,6 +42,7 @@
   align-content: center;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 30px;
 }
 
 .gallery__item {
@@ -63,4 +64,11 @@
 
 .info-item {
   margin: 4px 0;
+}
+
+
+.btn-secondary {
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 50px;
 }
