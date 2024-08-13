@@ -7,7 +7,7 @@ let lightbox;
 
 export function renderImages(images) {
   const gallery = document.querySelector('.gallery');
-  gallery.innerHTML = images
+  const markup = images
     .map(
       image => `
         <a href="${image.largeImageURL}" class="gallery__item">
@@ -22,6 +22,7 @@ export function renderImages(images) {
     `
     )
     .join('');
+  gallery.insertAdjacentHTML('beforeend', markup);
 
   if (!lightbox) {
     lightbox = new SimpleLightbox('.gallery a');
