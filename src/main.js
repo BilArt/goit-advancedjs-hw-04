@@ -18,12 +18,14 @@ document.body.appendChild(loadMoreBtn);
 let query = '';
 let page = 1;
 let totalHits = 0;
+let loadedHits = 0;
 
 form.addEventListener('submit', async event => {
   event.preventDefault();
 
   query = input.value.trim();
   page = 1;
+  loadedHits = 0;
 
   if (query === '') {
     showNotification('Please enter a search query', 'error');
@@ -34,7 +36,7 @@ form.addEventListener('submit', async event => {
 
   clearGallery();
   loader.style.display = 'block';
-  loadMoreBtn.style.display = 'none';
+  loadMoreBtn.style.display = 'none'; // Спочатку ховаємо кнопку "Load more"
 
   try {
     const data = await fetchImages(query, page);
@@ -46,7 +48,12 @@ form.addEventListener('submit', async event => {
       loadMoreBtn.style.display = 'none';
     } else {
       renderImages(data.hits);
-      loadMoreBtn.style.display = totalHits > 15 ? 'block' : 'none';
+      loadedHits += data.hits.length;
+      loadMoreBtn.style.display = loadedHits < totalHits ? 'block' : 'none';
+
+      if (loadedHits >= totalHits) {
+        showNotification("We're sorry, but you've reached the end of search results.", 'info');
+      }
     }
   } catch (error) {
     loader.style.display = 'none';
@@ -62,12 +69,20 @@ loadMoreBtn.addEventListener('click', async () => {
     const data = await fetchImages(query, page);
     loader.style.display = 'none';
 
-    if (data.hits.length === 0 || (page * 15) >= totalHits) {
-      showNotification("We're sorry, but you've reached the end of search results.", 'info');
-      loadMoreBtn.style.display = 'none';
-    } else {
+    if (data.hits.length > 0) {
       renderImages(data.hits);
-      window.scrollBy({ top: document.querySelector('.gallery').firstElementChild.getBoundingClientRect().height * 2, behavior: 'smooth' });
+      loadedHits += data.hits.length;
+      loadMoreBtn.style.display = loadedHits < totalHits ? 'block' : 'none';
+
+      window.scrollBy({
+        top: document.querySelector('.gallery').firstElementChild.getBoundingClientRect().height * 2,
+        behavior: 'smooth'
+      });
+
+      if (loadedHits >= totalHits) {
+        showNotification("We're sorry, but you've reached the end of search results.", 'info');
+        loadMoreBtn.style.display = 'none';
+      }
     }
   } catch (error) {
     loader.style.display = 'none';
